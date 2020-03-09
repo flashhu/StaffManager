@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Table, Button, Tag, Icon, message  } from 'antd'
 import StaffInfoDialog from '../staffInfoDialog'
-import { USER_STATUS, USER_TYPE } from '../../constant/data' 
+import { USER_STATUS } from '../../constant/data' 
 import HttpUtil from '../../util/HttpUtil.js';
 import ApiUtil from '../../util/ApiUtil.js';
 
@@ -10,25 +10,7 @@ class StaffList extends Component {
     super(props)
     this.state = {
       showInfoBox: false,
-      userlist:[{
-        no: 1,
-        id: "202001",  
-        name: '张三', 
-        email: '12726597@gmail.com', 
-        phone:'13245769870', 
-        department:'销售部', 
-        position: 2, 
-        status:1
-      }, { 
-        no: 2,
-        id: "202002",
-        name: '李四', 
-        email: '127262234247@gmail.com', 
-        phone:'13987653456', 
-        department:'人事部', 
-        position: 0, 
-        status:2
-      }],
+      userlist:[],
       editItem: null,
       loading: true
     }
@@ -79,9 +61,6 @@ class StaffList extends Component {
     dataIndex: 'position',
     key:"position",
     width:'100px',
-    render: d => <span className="m-status">
-                   <Tag color={USER_TYPE[d].color}>{USER_TYPE[d].name}</Tag>
-                 </span>
   }, {
     title: '状态',
     dataIndex: 'status',
@@ -120,9 +99,13 @@ class StaffList extends Component {
       })
     })
   }
+  
+  componentDidMount() {
+    this.getData();
+  }
 
   handleInfoDialogClose = (staff) => {
-    if(staff && staff.id) {
+    if(staff && staff.no) {
       //修改信息
       let data = [...this.state.userlist];
       for(let i = 0; i< data.length; i ++) {
@@ -138,6 +121,7 @@ class StaffList extends Component {
     } else {
       // 新增或删除信息
       this.getData();
+      console.log('add or delete');
     }
   }
 

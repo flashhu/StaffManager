@@ -55,7 +55,7 @@ class StaffInfoDialog extends Component {
         HttpUtil.post(ApiUtil.API_STAFF_UPDATE, values)
         .then(
           re => {
-            message.info(re.message);
+            message.success(re.message);
           }
         ).catch(error => {
           message.error(error.message);
@@ -94,10 +94,10 @@ class StaffInfoDialog extends Component {
       
     }
     
-    HttpUtil.get(ApiUtil.API_STAFF_DELETE + this.state.staff.id)
+    HttpUtil.get(ApiUtil.API_STAFF_DELETE + this.state.staff.no)
     .then(
       re => {
-        message.info(re.message);
+        message.success(re.message);
         this.setState({
           visible: false
         });
@@ -223,7 +223,7 @@ class StaffInfoDialog extends Component {
               })(
                 <Select placeholder="请选择">
                   {USER_TYPE.map((item) => 
-                    <Option value={item.id} key={item.id + ''}>{item.name}</Option>
+                    <Option value={item.name} key={item.id + ''}>{item.name}</Option>
                   )}
                 </Select>)}
             </Form.Item>
@@ -240,7 +240,7 @@ class StaffInfoDialog extends Component {
             </Form.Item>
 
             {
-              staff.id > 0 && <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
+              staff.no > 0 && <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
                 <Button
                   type="danger"
                   icon="delete"
