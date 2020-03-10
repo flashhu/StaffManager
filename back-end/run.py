@@ -30,3 +30,12 @@ def deleteStaff(no):
 	re = DBUtil.deleteStaff(no)
 	return json.dumps(re)
 
+@app.route(apiPrefix + 'searchStaff')
+def searchStaff():
+    # 拿到数据searchItems 字符串
+    data = request.args.get('search') 
+    # 变为原有类型
+    search = json.loads(data)
+    array = DBUtil.searchStaff(search)
+    jsonStaffs = DBUtil.getStaffsFromData(array)
+    return json.dumps(jsonStaffs)

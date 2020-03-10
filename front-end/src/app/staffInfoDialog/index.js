@@ -125,10 +125,9 @@ class StaffInfoDialog extends Component {
     const { visible, confirmLoading, staff } = this.state;
     const { getFieldDecorator } = this.props.form;
     const layout = {
-      labelCol: { span: 8 },
+      labelCol: { span: 5 },
       wrapperCol: { span: 16 },
     };
-    
 
     return (
       <Modal
@@ -190,7 +189,7 @@ class StaffInfoDialog extends Component {
                   prefix={<Icon type="mail" style={{color: 'rgba(0,0,0,.25)'}}/>}
                 />)}
             </Form.Item>
-            <Form.Item label="联系方式">
+            <Form.Item label="手机">
               {getFieldDecorator('phone', {
                 rules: [{
                   required: true, 

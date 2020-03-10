@@ -35,9 +35,9 @@ staffColumns = ('no', 'id', 'name', 'email', 'phone', 'department', 'position', 
 def getStaffList():
     tableName = 't_staff'
     columns = ','.join(staffColumns)
-    order = ' order by id'
+    order = ' ORDER BY id'
 
-    sql = "select %s from %s%s" % (columns, tableName, order)
+    sql = "SELECT %s FROM %s%s" % (columns, tableName, order)
     #print('getStaffList:', sql)
 
     cursor.execute(sql)
@@ -142,3 +142,53 @@ def deleteStaff(no):
             'message': repr(e)
         }
         return re
+
+def searchStaff(search):
+    try:
+        where = ''
+        like = ''
+        status = ''
+        
+        if search.get('department', 'empty') != 'empty':
+            if search.get('department') != 'all':
+                where += ("WHERE department='%s'" % str(search['department']))
+
+        # 0 => 所有 1,2，3表示状态
+        if search.get('status', -1) > 0:
+            status = ("status=" + str(search['status']))
+        if len(where) > 0:
+            if len(status) >0:
+                where += (" AND " + status)
+        else:
+            if len(status) >0:
+                where = ("WHERE " + status)
+
+        likeItems = []
+        for key, value in search.items():
+            if key != 'department':
+            # strip() 方法用于移除字符串头尾指定的字符（默认为空格或换行符）或字符序列
+                if isinstance(value, str) and (len(value.strip()) > 0):
+                    item = (key + " LIKE '%" + value + "%'")
+                    likeItems.append(item)
+        if len(likeItems) > 0:
+            like = "%s" % ' OR '.join(likeItems)
+
+        if len(where) > 0:
+            if len(like) > 0:
+                where += (" AND " + like)
+        else:
+            if len(like) > 0:
+                where = ("WHERE " + like)
+
+        columns = ','.join(staffColumns)
+        order = ' ORDER BY id'
+        sql = "SELECT %s FROM t_staff %s%s" % (columns, where, order)
+        
+        # print(sql)
+        cursor.execute(sql)
+
+        dataList = cursor.fetchall() #获取所有记录
+        return dataList
+    except Exception as e:
+        print('search:', repr(e))
+        return []

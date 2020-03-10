@@ -1,7 +1,7 @@
 export const USER_STATUS = [
-  {id: 0, name: '未激活', color:'red'}, 
-  {id: 1, name: '就职',   color:'blue'}, 
-  {id: 2, name: '离职',   color:'grey'}
+  {id: 1, name: '未激活', color:'red'}, 
+  {id: 2, name: '就职',   color:'blue'}, 
+  {id: 3, name: '离职',   color:'grey'}
 ]
 
 export const USER_TYPE = [
