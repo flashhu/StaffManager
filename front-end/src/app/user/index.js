@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
-import { Table, Button, Tag, Icon, Select, Input, message  } from 'antd'
-import StaffInfoDialog from '../staffInfoDialog'
+import { Table, Button, Tag, Icon, Select, Input, message, Spin } from 'antd'
+import StaffInfoDialog from '../../component/staffInfoDialog'
 import { USER_STATUS, DEPT_TYPE } from '../../constant/data' 
 import HttpUtil from '../../util/HttpUtil.js';
 import ApiUtil from '../../util/ApiUtil.js';
@@ -212,13 +212,15 @@ class StaffList extends Component {
           </Button>
         </div>
 
-        <Table 
-          dataSource={userlist} 
-          columns={this.columns} 
-          rowKey={item => item.id}
-          pagination={{ pageSize: 7 }}
-          style={{clear:'both', marginTop:10}}
-        />
+        <Spin spinning={this.state.loading} size="large" delay={500}>
+          <Table 
+            dataSource={userlist} 
+            columns={this.columns} 
+            rowKey={item => item.id}
+            pagination={{ pageSize: 7 }}
+            style={{clear:'both', marginTop:10}}
+          />
+        </Spin>
 
         <StaffInfoDialog
           visible={showInfoBox}

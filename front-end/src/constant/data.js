@@ -13,6 +13,6 @@ export const USER_TYPE = [
 export const DEPT_TYPE = ['财务部', '人事部', '行政部', '技术部']
 
 export const MENU_MAIN = [
-  { title:'人员管理', icon:'team',   path: '/user' },
-  { title:'考勤管理', icon:'idcard', path: '/card' }
+  { title:'人员信息', icon:'team',   path: '/' },
+  { title: '公告资讯', icon:'bell', path: '/post' }
 ]
