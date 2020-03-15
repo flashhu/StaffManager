@@ -51,7 +51,7 @@ class StaffInfoDialog extends Component {
         this.setState({
           confirmLoading: true,
         });
-
+        console.log(values);
         HttpUtil.post(ApiUtil.API_STAFF_UPDATE, values)
         .then(
           re => {
@@ -145,6 +145,11 @@ class StaffInfoDialog extends Component {
           <Form {...layout} onSubmit={this.handleSubmit}>
             <Form.Item>
               {getFieldDecorator('no')(
+                <Input type="hidden" />
+              )}
+            </Form.Item>
+            <Form.Item>
+              {getFieldDecorator('passwd')(
                 <Input type="hidden" />
               )}
             </Form.Item>

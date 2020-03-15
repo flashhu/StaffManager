@@ -16,6 +16,7 @@ def createTables():
             no INTEGER PRIMARY KEY AUTOINCREMENT,
             id VARCHAR(10) NOT NULL,
             name VARCHAR(40) NOT NULL,
+            passwd VARCHAR(40) NOT NULL,
             email VARCHAR(50),
             phone VARCHAR(11) NOT NULL,
             department VARCHAR(20) NOT NULL,
@@ -30,7 +31,7 @@ def createTables():
 
 createTables()
 
-staffColumns = ('no', 'id', 'name', 'email', 'phone', 'department', 'position', 'status')
+staffColumns = ('no', 'id', 'name', 'passwd', 'email', 'phone', 'department', 'position', 'status')
 
 def getStaffList():
     tableName = 't_staff'
@@ -64,29 +65,27 @@ def addOrUpdateStaff(json_str):
         print('addOrUpdateStaff:', json_str)
         staff = json.loads(json_str) #字典
         no = staff.get('no', 0) #默认为0 判断操作类型
+        passwd = staff.get('passwd', '123456')
         result = 'default' #提示结果
         newNo = no #序号
-
+        
         if no == 0: #add
             keys = '' 
             values = ''
-            isFirst = True
             for key, value in staff.items():
-                if isFirst:
-                    isFirst = False
-                else:
-                    keys += ','
-                    values += ','
                 keys += key
                 #隐式类型的副作用 ？
                 if isinstance(value, str):
                     values += ("'%s'" % value)
                 else:
                     values += str(value)
-
+                keys += ','
+                values += ','
+            keys += "passwd"
+            values += ("'%s'" % passwd)
             sql = "INSERT INTO t_staff (%s) values (%s)" % (keys, values)
 
-            #print(sql)
+            # print(sql)
             cursor.execute(sql)
             result = '添加成功'
             newNo = cursor.lastrowid
@@ -109,7 +108,7 @@ def addOrUpdateStaff(json_str):
             where = "WHERE id=" + str(staff.get('id'))
             sql = "UPDATE t_staff SET %s %s" % (update, where)
 
-            #print(sql)
+            # print(sql)
             cursor.execute(sql)
             result = '更新成功'
             print(result, 'noSum:', cursor.rowcount)
@@ -192,3 +191,41 @@ def searchStaff(search):
     except Exception as e:
         print('search:', repr(e))
         return []
+
+def doLogin(json_str):
+    try:
+        print('doLogin:', json_str)
+        user = json.loads(json_str)  # 字典
+        isLogin = False
+
+        columns = ','.join(staffColumns)
+        sql = "SELECT %s FROM t_staff WHERE id=%s" % (columns, user["id"])
+
+        # print(sql)
+        cursor.execute(sql)
+        dataList = cursor.fetchall()
+        currUser = getStaffsFromData(dataList)
+        # print(len(currUser))
+        
+        if len(currUser) > 0:
+            if currUser[0]["passwd"] == user["passwd"]:
+                isLogin = True
+                result = "登录成功"
+            else:
+                result = "密码错误"
+        else:
+            result = "工号不存在"
+        # print(isLogin)
+
+        re = {
+            'isLogin': isLogin,
+            'message': result,
+            'currUser': currUser[0]
+        }
+        return re
+    except Exception as e:
+        print('Login:', repr(e))
+        re = {
+            'message': repr(e)
+        }
+        return re

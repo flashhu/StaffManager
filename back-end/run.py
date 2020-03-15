@@ -39,3 +39,10 @@ def searchStaff():
     array = DBUtil.searchStaff(search)
     jsonStaffs = DBUtil.getStaffsFromData(array)
     return json.dumps(jsonStaffs)
+
+#login接口
+@app.route(apiPrefix + 'doLogin', methods=["POST"])
+def doLogin():
+    data = request.get_data(as_text=True)
+    re = DBUtil.doLogin(data)
+    return json.dumps(re)

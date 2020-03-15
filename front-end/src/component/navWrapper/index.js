@@ -1,7 +1,9 @@
 import React, {Component} from 'react'
 import { NavLink } from 'react-router-dom'
+import { inject, observer } from 'mobx-react'
+import { computed } from 'mobx'
 import { Layout, Menu, Icon, Avatar } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import myIcon from '../../image/orca.jpg'
 import { MENU_MAIN } from '../../constant/data'
 
@@ -9,12 +11,23 @@ import 'antd/dist/antd.css'
 
 const { Content, Sider, Footer } = Layout
 
+@inject('userStore')
+@observer
 class NavWrapper extends Component{
   constructor(props) {
     super(props)
     this.state = {
       collapsed: false
     }
+  }
+
+  @computed
+  get currUser() {
+    return this.props.userStore.currUser
+  }
+
+  doLogOut = () => {
+    this.props.userStore.logout();
   }
 
   onCollapse = collapsed => {
@@ -26,6 +39,7 @@ class NavWrapper extends Component{
 
     return (
       <Layout style={{ minHeight: '100vh'}}>
+        { !this.currUser && <Redirect to='/' />}
         <Sider
           width={152}
           collapsible
@@ -35,14 +49,21 @@ class NavWrapper extends Component{
           <Menu 
             theme="dark"  
             mode="inline"
-            defaultSelectedKeys={['0']} 
           >
             <div style={{height:100,backgroundColor:"#002140", textAlign: 'center'}}>
               <Avatar src={myIcon} alt='' style={{width:60, height:60, marginTop:20}}/>
             </div>
             <div style={{ height: 30, backgroundColor: "#002140", textAlign: 'center'}}>
-              <Link to='/login' style={{ color: '#fff', marginRight:10 }}>登录</Link>
-              <Link to='/register' style={{ color: '#fff' }}>注册</Link>
+              { this.currUser ?
+                <div>
+                  <span style={{ color: '#fff', marginRight: 10, display:'inline-block'}}>{this.currUser["name"]}</span>
+                  <span style={{ color: '#fff' }} onClick={this.doLogOut}>登出</span>
+                </div>:
+                <div>
+                  <Link to='/login' style={{ color: '#fff', marginRight: 10 }}>登录</Link>
+                  <Link to='/register' style={{ color: '#fff' }}>注册</Link>
+                </div>
+              }
             </div>
             {MENU_MAIN.map((item,j)=>
               <Menu.Item key={j}>

@@ -1,4 +1,7 @@
 import React, { Component, Fragment } from 'react'
+import { Redirect } from 'react-router-dom'
+import { inject, observer } from 'mobx-react'
+import { computed } from 'mobx'
 import { Table, Button, Tag, Icon, Select, Input, message, Spin } from 'antd'
 import StaffInfoDialog from '../../component/staffInfoDialog'
 import { USER_STATUS, DEPT_TYPE } from '../../constant/data' 
@@ -7,6 +10,8 @@ import ApiUtil from '../../util/ApiUtil.js';
 
 const { Option } = Select;
 
+@inject('userStore')
+@observer
 class StaffList extends Component {
   constructor(props) {
     super(props)
@@ -23,11 +28,16 @@ class StaffList extends Component {
   //用于搜索，存放搜索关键词
   searchItems = {}
 
+  @computed
+  get currUser() {
+    return this.props.userStore.currUser
+  }
+
   showInfoDialog = (item) => {
     if (item === undefined) {
       item = null;
     }
-
+    
     this.setState({
       showInfoBox: true,
       editItem: item
@@ -90,6 +100,7 @@ class StaffList extends Component {
     .then(
       staffList => {
         this.allData = staffList;
+        // console.log('staff:',this.allData)
         this.setState({
           showInfoBox: false,
           userlist: staffList,
@@ -169,6 +180,10 @@ class StaffList extends Component {
     // console.log('list render:', this.state.showInfoBox, this.state.editItem);
     const { showInfoBox, editItem, userlist } = this.state;
     const seachBar = {width:160, marginTop:10, marginRight:5};
+     
+    if(!this.currUser){
+      return <Redirect to='/login' />
+    }
 
     return (
       <Fragment>
