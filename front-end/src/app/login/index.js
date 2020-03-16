@@ -74,11 +74,11 @@ class Login extends Component {
                 </Button>
               </Form.Item>
               <Form.Item>
-                <Link to='/register'>
-                  <Button type="primary" block>
+                <Button type="primary" block>
+                  <Link to='/register'>
                     注册
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </Form.Item>
             </Form>
           </div>

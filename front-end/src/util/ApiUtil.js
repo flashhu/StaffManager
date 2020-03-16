@@ -8,4 +8,5 @@ export default class ApiUtil {
   static API_STAFF_SEARCH = ApiUtil.URL_ROOT + '/searchStaff';
 
   static API_USER_LOGIN = ApiUtil.URL_ROOT + '/doLogin';
+  static API_USER_REGISTER = ApiUtil.URL_ROOT + '/doRegister';
 }

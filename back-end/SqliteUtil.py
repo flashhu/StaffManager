@@ -60,6 +60,18 @@ def getStaffsFromData(dataList):
 
     return staffs
 
+
+def searchId(user):
+    columns = ','.join(staffColumns)
+    sql = "SELECT %s FROM t_staff WHERE id=%s" % (columns, user["id"])
+
+    # print(sql)
+    cursor.execute(sql)
+    dataList = cursor.fetchall()
+    currUser = getStaffsFromData(dataList)
+
+    return currUser
+
 def addOrUpdateStaff(json_str):
     try:
         print('addOrUpdateStaff:', json_str)
@@ -68,53 +80,59 @@ def addOrUpdateStaff(json_str):
         passwd = staff.get('passwd', '123456')
         result = 'default' #提示结果
         newNo = no #序号
+        isExist = False
         
-        if no == 0: #add
-            keys = '' 
-            values = ''
-            for key, value in staff.items():
-                keys += key
-                #隐式类型的副作用 ？
-                if isinstance(value, str):
-                    values += ("'%s'" % value)
-                else:
-                    values += str(value)
-                keys += ','
-                values += ','
-            keys += "passwd"
-            values += ("'%s'" % passwd)
-            sql = "INSERT INTO t_staff (%s) values (%s)" % (keys, values)
+        if len(searchId(staff)) > 0:
+            result = '用户已存在'
+            isExist = True
+        else:
+            if no == 0: #add
+                keys = '' 
+                values = ''
+                for key, value in staff.items():
+                    keys += key
+                    #隐式类型的副作用 ？
+                    if isinstance(value, str):
+                        values += ("'%s'" % value)
+                    else:
+                        values += str(value)
+                    keys += ','
+                    values += ','
+                keys += "passwd"
+                values += ("'%s'" % passwd)
+                sql = "INSERT INTO t_staff (%s) values (%s)" % (keys, values)
 
-            # print(sql)
-            cursor.execute(sql)
-            result = '添加成功'
-            newNo = cursor.lastrowid
-            print(result, "newNo:", cursor.lastrowid)
-        else: #修改
-            update = ''
-            isFirst = True
-            for key, value in staff.items():
-                if key == 'no':
-                    continue
-                if isFirst:
-                    isFirst = False
-                else:
-                    update += ","
-                if isinstance(value, str):
-                    update += (key + "='" + value + "'")
-                else:
-                    update += (key + "=" + str(value))
+                # print(sql)
+                cursor.execute(sql)
+                result = '添加成功'
+                newNo = cursor.lastrowid
+                print(result, "newNo:", cursor.lastrowid)
+            else: #修改
+                update = ''
+                isFirst = True
+                for key, value in staff.items():
+                    if key == 'no':
+                        continue
+                    if isFirst:
+                        isFirst = False
+                    else:
+                        update += ","
+                    if isinstance(value, str):
+                        update += (key + "='" + value + "'")
+                    else:
+                        update += (key + "=" + str(value))
 
-            where = "WHERE id=" + str(staff.get('id'))
-            sql = "UPDATE t_staff SET %s %s" % (update, where)
+                where = "WHERE id=" + str(staff.get('id'))
+                sql = "UPDATE t_staff SET %s %s" % (update, where)
 
-            # print(sql)
-            cursor.execute(sql)
-            result = '更新成功'
-            print(result, 'noSum:', cursor.rowcount)
+                # print(sql)
+                cursor.execute(sql)
+                result = '更新成功'
+                print(result, 'noSum:', cursor.rowcount)
 
         conn.commit()
         re = {
+            'isExist': isExist,
             'message': result
         }
         return re
@@ -197,14 +215,7 @@ def doLogin(json_str):
         print('doLogin:', json_str)
         user = json.loads(json_str)  # 字典
         isLogin = False
-
-        columns = ','.join(staffColumns)
-        sql = "SELECT %s FROM t_staff WHERE id=%s" % (columns, user["id"])
-
-        # print(sql)
-        cursor.execute(sql)
-        dataList = cursor.fetchall()
-        currUser = getStaffsFromData(dataList)
+        currUser = searchId(user)
         # print(len(currUser))
         
         if len(currUser) > 0:
@@ -214,17 +225,68 @@ def doLogin(json_str):
             else:
                 result = "密码错误"
         else:
-            result = "工号不存在"
+            result = "用户不存在"
         # print(isLogin)
 
         re = {
             'isLogin': isLogin,
             'message': result,
-            'currUser': currUser[0]
+            'currUser': currUser
         }
         return re
     except Exception as e:
         print('Login:', repr(e))
+        re = {
+            'message': repr(e)
+        }
+        return re
+
+def doRegister(json_str):
+    try:
+        user = json.loads(json_str)  # 字典
+        user['status'] = 1
+        print('doRegister:', user)
+
+        keys = ''
+        values = ''
+        isFirst = True
+        isRegister = False
+        resUser = searchId(user)
+
+        # 检验是否存在该Id
+        if len(resUser) > 0:
+            result = '用户已存在'
+        else:
+            for key, value in user.items():
+                if key == 're_passwd':
+                    continue
+                if(isFirst):
+                    isFirst = False
+                else:
+                    keys += ','
+                    values += ','
+                keys += key
+                #隐式类型的副作用 ？
+                if isinstance(value, str):
+                    values += ("'%s'" % value)
+                else:
+                    values += str(value)
+
+            sql = "INSERT INTO t_staff (%s) values (%s)" % (keys, values)
+
+            # print(sql)
+            cursor.execute(sql)
+            result = '注册成功'
+            isRegister = True
+        
+        conn.commit()
+        re = {
+            'isRegister': isRegister,
+            'message': result
+        }
+        return re
+    except Exception as e:
+        print('Register:', repr(e))
         re = {
             'message': repr(e)
         }

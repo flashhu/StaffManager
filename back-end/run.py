@@ -46,3 +46,10 @@ def doLogin():
     data = request.get_data(as_text=True)
     re = DBUtil.doLogin(data)
     return json.dumps(re)
+
+#register接口
+@app.route(apiPrefix + 'doRegister', methods=["POST"])
+def doRegister():
+    data = request.get_data(as_text=True)
+    re = DBUtil.doRegister(data)
+    return json.dumps(re)

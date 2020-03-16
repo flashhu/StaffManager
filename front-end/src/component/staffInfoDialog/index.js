@@ -55,7 +55,11 @@ class StaffInfoDialog extends Component {
         HttpUtil.post(ApiUtil.API_STAFF_UPDATE, values)
         .then(
           re => {
-            message.success(re.message);
+            if (re.isExist){
+              message.error(re.message);
+            } else{
+              message.success(re.message);
+            }
           }
         ).catch(error => {
           message.error(error.message);
